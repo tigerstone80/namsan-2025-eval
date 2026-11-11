@@ -1,0 +1,651 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>2025학년도 1학기 교무업무 평가</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --ink:#17333A; --teal:#2A6F6B; --amber:#E3A23B; --amber-d:#B7802A; --red:#C0563B;
+  --paper:#F3F7F6; --mint:#D9EAE6; --sub:#CFE3DF; --line:#C9D6D3; --gray:#5E6B70; --text:#22313A; --deep:#22454C;
+  --ez:cubic-bezier(.22,.68,.18,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#0E2126;overflow:hidden}
+body{font-family:Pretendard,"Malgun Gothic",sans-serif;color:var(--text);word-break:keep-all;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+
+#stage{position:absolute;left:0;top:0;width:1920px;height:1080px;transform-origin:0 0;overflow:hidden;background:#fff}
+.page{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity .5s var(--ez),visibility 0s .5s;background:#fff}
+.page.on{opacity:1;visibility:visible;transition:opacity .5s var(--ez)}
+.page.dark{background:var(--ink);color:#fff}
+.page.paper{background:var(--paper)}
+
+[data-s]{opacity:0;transform:translateY(18px);transition:opacity .55s var(--ez),transform .7s var(--ez)}
+[data-s].in{opacity:1;transform:none}
+.bar{transform:scaleX(0);transform-origin:left center;transition:transform 1s var(--ez)}
+.in .bar,.bar.in{transform:none}
+html.static [data-s]{opacity:1!important;transform:none!important}
+html.static .bar{transform:none!important}
+html.static *{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition-duration:.01s!important;animation:none!important}}
+
+/* shared header */
+.sec{position:absolute;left:96px;top:64px;display:flex;align-items:center;gap:14px;font-size:24px;font-weight:700;color:var(--teal)}
+.sec i{width:14px;height:14px;border-radius:50%;background:currentColor;display:block}
+.sec.result{color:var(--amber-d)}.sec.prop{color:var(--red)}
+.head{position:absolute;left:96px;top:110px;right:200px;margin:0;font-size:56px;line-height:1.25;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.dark .head{color:#fff}
+.k6{color:var(--teal)}.kf{color:var(--amber-d)}.kr{color:var(--red)}
+
+/* footer chrome */
+#chrome{position:absolute;left:0;right:0;bottom:0;height:84px;display:flex;align-items:center;gap:28px;padding:0 56px 0 96px;z-index:27;pointer-events:none}
+#chrome>*{pointer-events:auto}
+#prog{flex:1;display:flex;gap:6px;align-items:center;height:20px}
+#prog button{flex:1;height:6px;border:0;padding:0;border-radius:3px;background:rgba(23,51,58,.14)}
+#prog button.intro.done{background:var(--teal)}#prog button.result.done{background:var(--amber)}#prog button.prop.done{background:var(--red)}#prog button.hook.done{background:var(--ink)}
+#prog button.cur{height:12px}
+.darkchrome #prog button{background:rgba(255,255,255,.18)}
+.darkchrome #prog button.hook.done{background:#fff}
+#pn{font-size:20px;font-weight:700;color:var(--gray);min-width:72px;text-align:right;font-variant-numeric:tabular-nums}
+.darkchrome #pn{color:var(--sub)}
+.cb{height:44px;padding:0 18px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:19px;font-weight:700;border-radius:22px}
+.cb:hover{border-color:var(--teal);color:var(--teal)}
+.cb[hidden]{display:none}
+.darkchrome .cb{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+
+/* hook 1 */
+.p1 .lead{position:absolute;left:120px;top:120px;font-size:30px;font-weight:700;color:var(--amber)}
+.p1 h1{position:absolute;left:120px;top:170px;margin:0;font-size:72px;font-weight:700;letter-spacing:-.02em}
+.say{position:absolute;top:360px;width:800px;height:420px;border-radius:28px;padding:56px 60px}
+.say.a{left:120px;background:var(--deep)}
+.say.b{left:1000px;background:var(--teal)}
+.say .who{display:inline-grid;place-items:center;width:72px;height:72px;border-radius:50%;font-size:34px;font-weight:700}
+.say.a .who{background:var(--gray);color:#fff}.say.b .who{background:var(--amber);color:var(--ink)}
+.say q{display:block;margin-top:46px;font-size:52px;line-height:1.35;font-weight:700;quotes:"“" "”"}
+.say.a q{color:var(--sub)}
+.say small{position:absolute;left:60px;bottom:48px;font-size:22px;opacity:.85}
+.p1 .foot{position:absolute;left:120px;top:850px;font-size:26px;color:var(--sub)}
+
+/* hook 2 (vs) */
+.vsq{position:absolute;left:120px;top:110px;right:260px;font-size:40px;line-height:1.4;font-weight:700;color:var(--ink)}
+.vs{position:absolute;top:290px;width:780px;height:470px;border-radius:28px;padding:48px 56px}
+.vs.l{left:120px;background:#fff;box-shadow:0 10px 30px rgba(23,51,58,.10)}
+.vs.r{left:1020px;background:var(--ink);color:#fff}
+.vs h3{margin:0;font-size:30px;font-weight:700}
+.vs.l h3{color:var(--teal)}.vs.r h3{color:var(--amber)}
+.vs .n{margin-top:24px;font-size:230px;line-height:1;font-weight:700;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.vs .n small{font-size:56px;margin-left:12px;letter-spacing:0}
+.vs.l .n{color:var(--ink)}
+.vs p{margin:20px 0 0;font-size:26px;opacity:.8}
+.vsdot{position:absolute;left:900px;top:480px;width:120px;height:120px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:36px;font-weight:700;border:6px solid var(--paper);z-index:2}
+.punch{position:absolute;left:120px;top:810px;font-size:38px;font-weight:700;color:var(--red)}
+.srcl{position:absolute;left:120px;top:880px;font-size:20px;color:var(--gray)}
+
+/* title */
+.p3 .kick{position:absolute;left:120px;top:200px;font-size:30px;font-weight:700;color:var(--amber)}
+.p3 h1{position:absolute;left:120px;top:252px;width:1140px;margin:0;font-size:55px;line-height:1.32;font-weight:700;letter-spacing:-.02em}
+.p3 h1 em{display:block;font-style:normal;color:var(--amber);font-size:76px;line-height:1.2;margin-top:14px}
+.p3 .st2{position:absolute;left:120px;top:540px;font-size:30px;color:var(--sub);padding-top:26px;border-top:2px solid rgba(255,255,255,.18);width:1080px}
+.p3 .by{position:absolute;left:120px;top:820px;font-size:30px}
+.orbit{position:absolute;left:1280px;top:290px;width:480px;height:480px}
+.orbit .o1{position:absolute;inset:0;border-radius:50%;background:var(--deep)}
+.orbit .o2{position:absolute;inset:80px;border-radius:50%;background:var(--teal);display:grid;place-items:center;font-size:44px;font-weight:700;text-align:center;line-height:1.3}
+.orbit .t{position:absolute;padding:14px 22px;border-radius:30px;font-size:26px;font-weight:700}
+.orbit .t6{left:-60px;top:20px;background:var(--teal);color:#fff;border:3px solid var(--ink)}
+.orbit .tf{right:-50px;bottom:10px;background:var(--amber);color:var(--ink)}
+
+/* overview */
+.quote{position:absolute;left:96px;right:96px;top:250px;padding:34px 44px;background:var(--mint);border-radius:20px;font-size:34px;font-weight:700;color:var(--ink);line-height:1.4}
+.quote b{color:var(--teal)}.quote b.r{color:var(--red)}.quote b.a{color:var(--amber-d)}
+.stat3{position:absolute;left:96px;right:96px;top:440px;display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+.stat{border-radius:22px;padding:36px 40px;background:var(--paper);min-height:330px}
+.stat.dk{background:var(--ink);color:#fff}
+.stat .big{font-size:110px;font-weight:700;line-height:1;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.stat .big small{font-size:34px;margin-left:8px;letter-spacing:0}
+.stat b{display:block;margin-top:20px;font-size:30px}
+.stat>span{display:block;margin-top:12px;font-size:22px;line-height:1.5;color:var(--gray)}
+.stat.dk>span{color:var(--sub)}
+.common{position:absolute;left:96px;right:96px;top:810px;font-size:22px;color:var(--text);line-height:1.6}
+.common b{color:var(--ink)}
+
+/* flow */
+.flow{position:absolute;left:96px;right:96px;top:260px;display:grid;grid-template-columns:repeat(8,1fr)}
+.flow:before{content:"";position:absolute;left:5%;right:5%;top:52px;height:4px;background:var(--line)}
+.fs{position:relative;text-align:center;padding:0 6px}
+.fs .dot{margin:0 auto;width:108px;height:108px;border-radius:50%;background:var(--teal);color:#fff;display:grid;place-items:center;font-size:30px;font-weight:700;border:6px solid #fff;position:relative;line-height:1.05;font-variant-numeric:tabular-nums}
+.fs.now .dot{box-shadow:0 0 0 4px var(--amber)}
+.fs.now .dot:after{content:"오늘";position:absolute;top:-34px;left:50%;transform:translateX(-50%);font-size:18px;font-weight:700;color:var(--amber-d)}
+.fs.last .dot{background:var(--amber);color:var(--ink)}
+.fs b{display:block;margin-top:18px;font-size:26px;color:var(--ink);line-height:1.3}
+.fs span{display:block;margin-top:8px;font-size:20px;line-height:1.45;color:var(--gray)}
+.flow .fs{opacity:0;transform:translateY(14px);transition:opacity .45s var(--ez),transform .6s var(--ez)}
+.flow.in .fs{opacity:1;transform:none}
+.flow.in .fs:nth-child(2){transition-delay:.1s}.flow.in .fs:nth-child(3){transition-delay:.2s}.flow.in .fs:nth-child(4){transition-delay:.3s}.flow.in .fs:nth-child(5){transition-delay:.4s}.flow.in .fs:nth-child(6){transition-delay:.5s}.flow.in .fs:nth-child(7){transition-delay:.6s}.flow.in .fs:nth-child(8){transition-delay:.7s}
+.twin{position:absolute;left:96px;right:96px;top:600px;display:grid;grid-template-columns:1fr 1.15fr;gap:36px}
+.panel{background:var(--paper);border-radius:20px;padding:30px 36px;min-height:300px}
+.panel.wh{background:#fff;border:1.5px solid var(--line)}
+.panel h4{margin:0 0 14px;font-size:26px;color:var(--teal)}
+.panel h4 small{font-size:19px;color:var(--gray);font-weight:600;margin-left:10px}
+.panel.wh h4{color:var(--amber-d)}
+.panel ul{margin:0;padding:0;list-style:none}
+.panel li{font-size:23px;line-height:1.45;margin-top:12px;padding-left:22px;position:relative}
+.panel li:before{content:"";position:absolute;left:0;top:13px;width:9px;height:9px;border-radius:50%;background:var(--teal)}
+.panel.wh li:before{background:var(--amber)}
+.panel li b{color:var(--ink)}
+.panel li span{color:var(--gray);font-size:20px}
+.panel.cols ul{display:grid;grid-template-columns:1fr 1fr;gap:0 30px}
+
+/* divider */
+.div .no{position:absolute;left:120px;top:200px;font-size:200px;font-weight:700;line-height:1;letter-spacing:-.04em}
+.div.r .no{color:var(--amber)}.div.p .no{color:var(--red)}
+.div .lb{position:absolute;left:128px;top:430px;font-size:30px;font-weight:700;color:var(--sub)}
+.div h2{position:absolute;left:120px;top:490px;margin:0;font-size:84px;line-height:1.2;font-weight:700;letter-spacing:-.02em}
+.div .chips{position:absolute;left:120px;top:810px;display:flex;gap:16px;flex-wrap:wrap;right:700px}
+.div .chips span{padding:12px 26px;border-radius:30px;background:var(--deep);font-size:24px;font-weight:700}
+.div .ring{position:absolute;left:1260px;top:220px;width:520px;height:520px;border-radius:50%;background:var(--deep)}
+.div .ring i{position:absolute;inset:90px;border-radius:50%}
+.div.r .ring i{background:var(--amber)}.div.p .ring i{background:var(--red)}
+.div .ring svg{position:absolute;left:50%;top:50%;width:150px;height:150px;transform:translate(-50%,-50%)}
+
+/* triad: 운영내용 / 문제점 / 2학기 반영 */
+.tri{position:absolute;left:96px;right:96px;top:250px;display:grid;grid-template-columns:1.05fr 1fr 1.15fr;gap:30px}
+.tc{border-radius:22px;padding:34px 36px;min-height:520px;background:var(--paper);position:relative}
+.tc.pb{background:#FBEDE8}
+.tc.fx{background:var(--ink);color:#fff}
+.tc .tag{display:inline-flex;align-items:center;gap:10px;font-size:22px;font-weight:700;padding:8px 18px;border-radius:999px;background:#fff}
+.tc .tag i{width:12px;height:12px;border-radius:50%;display:block}
+.tc.op .tag{color:var(--teal)}.tc.op .tag i{background:var(--teal)}
+.tc.pb .tag{color:var(--red)}.tc.pb .tag i{background:var(--red)}
+.tc.fx .tag{background:var(--amber);color:var(--ink)}.tc.fx .tag i{background:var(--ink)}
+.tc ul{margin:26px 0 0;padding:0;list-style:none}
+.tc li{font-size:27px;line-height:1.45;margin-top:18px;padding-left:30px;position:relative;font-weight:600;color:var(--ink)}
+.tc.fx li{color:#fff}
+.tc li:before{content:"▶";position:absolute;left:0;top:5px;font-size:16px;color:var(--teal)}
+.tc.pb li:before{color:var(--red)}.tc.fx li:before{color:var(--amber)}
+.tc li span{display:block;font-size:21px;font-weight:500;color:var(--gray);margin-top:4px}
+.tc.fx li span{color:var(--sub)}
+.tc .sv{display:inline-block;margin-left:6px;font-size:17px;font-weight:700;padding:3px 12px;border-radius:999px;background:var(--amber);color:var(--ink);vertical-align:3px;white-space:nowrap}
+.tc.pb .sv{background:#fff;color:var(--red);border:1.5px solid var(--red)}
+.tc .bigf{font-size:96px;font-weight:700;line-height:1;margin-top:30px;color:var(--teal);letter-spacing:-.03em}
+.tc .bigf small{font-size:30px;margin-left:8px;letter-spacing:0;color:var(--ink)}
+.band{position:absolute;left:96px;right:96px;top:850px;padding:22px 34px;border-radius:18px;background:var(--ink);color:#fff;font-size:28px;font-weight:700}
+.band b{color:var(--amber)}
+.band.mint{background:var(--mint);color:var(--ink)}
+.band.mint b{color:var(--teal);margin-right:14px}
+
+/* table rows (act) */
+.act{position:absolute;left:96px;right:96px;top:250px}
+.ar{display:grid;grid-template-columns:330px 1fr 1fr;border-bottom:1.5px solid var(--line)}
+.ar>div{padding:30px 30px;font-size:26px;line-height:1.5}
+.ar .who{display:flex;align-items:center;gap:16px;font-weight:700;color:var(--ink);background:var(--paper);font-size:28px}
+.ar .who i{width:22px;height:22px;border-radius:50%;flex:none;background:var(--teal)}
+.ar .bad{color:var(--red);font-weight:600}
+.ar .fix{color:var(--teal);font-weight:700}
+.ar.hd>div{background:var(--ink);color:#fff;font-weight:700;padding:18px 30px;font-size:24px}
+.ar.hd>div:first-child{border-radius:16px 0 0 0}.ar.hd>div:last-child{border-radius:0 16px 0 0;background:var(--teal)}
+.ar.hd>div:nth-child(2){background:var(--red)}
+
+/* field trip */
+.trip{position:absolute;left:96px;top:250px;width:820px}
+.trip h4,.money h4{margin:0 0 18px;font-size:26px;color:var(--teal)}
+.gr{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.gr div{background:var(--paper);border-radius:18px;padding:22px 10px;text-align:center}
+.gr div b{display:block;font-size:26px;color:var(--ink)}
+.gr div span{display:block;margin-top:10px;font-size:23px;font-weight:700;color:var(--teal);line-height:1.35;font-variant-numeric:tabular-nums}
+.money{position:absolute;left:1000px;right:96px;top:250px}
+.mrow{display:grid;grid-template-columns:270px 1fr;align-items:center;margin-bottom:14px}
+.mrow .lab{font-size:22px;color:var(--text);line-height:1.3;padding-right:16px}
+.mrow .bars div{position:relative;height:40px;border-radius:0 8px 8px 0}
+.mrow .bars em{position:absolute;left:calc(100% + 12px);top:6px;font-style:normal;font-size:22px;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mrow.tot .lab{font-weight:700;color:var(--ink)}
+.c6{background:var(--teal)}.cf{background:var(--amber)}.ck{background:var(--ink)}
+.twin2{position:absolute;left:96px;right:96px;top:540px;display:grid;grid-template-columns:1fr 1.2fr;gap:36px}
+
+/* compare table */
+.tbl{position:absolute;left:96px;right:96px;top:240px;border-collapse:separate;border-spacing:0;width:calc(100% - 192px);font-size:23px}
+.tbl th{text-align:left;padding:18px 26px;color:#fff;font-size:24px}
+.tbl th:first-child{background:var(--ink);border-radius:16px 0 0 0;width:270px}
+.tbl th.hp{background:var(--red)}.tbl th.hf{background:var(--teal);border-radius:0 16px 0 0}
+.tbl td{padding:15px 26px;border-bottom:1.5px solid var(--line);line-height:1.4;vertical-align:top}
+.tbl td:first-child{font-weight:700;color:var(--ink);background:var(--paper)}
+.tbl td em{font-style:normal;font-size:16px;font-weight:700;padding:2px 10px;border-radius:999px;background:var(--amber);color:var(--ink);margin-left:6px;white-space:nowrap}
+
+/* four cards */
+.imp4{position:absolute;left:96px;right:96px;top:250px;display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.imp{background:var(--paper);border-radius:22px;padding:32px 38px;min-height:250px}
+.imp.dk{background:var(--ink);color:#fff}
+.imp h4{margin:0;display:flex;gap:18px;align-items:center;font-size:31px;color:var(--ink)}
+.imp.dk h4{color:#fff}
+.imp h4 em{font-style:normal;width:58px;height:58px;border-radius:50%;background:var(--red);color:#fff;display:grid;place-items:center;font-size:28px;flex:none}
+.imp p{margin:18px 0 0;font-size:24px;line-height:1.55}
+.imp.dk p{color:var(--sub)}
+.imp p b{color:var(--ink)}.imp.dk p b{color:var(--amber)}
+
+/* request cards */
+.req{position:absolute;left:96px;right:96px;top:250px;display:grid;grid-template-columns:repeat(4,1fr);gap:26px}
+.rq{background:var(--paper);border-radius:22px;padding:32px 32px;min-height:500px;position:relative}
+.rq .ic{width:80px;height:80px;border-radius:50%;display:grid;place-items:center;background:#fff}
+.rq .ic svg{width:40px;height:40px}
+.rq h4{margin:20px 0 0;font-size:32px;color:var(--ink)}
+.rq h5{margin:6px 0 0;font-size:20px;color:var(--gray);font-weight:600}
+.rq .empty{margin-top:28px;border:2px dashed var(--line);border-radius:16px;padding:26px 20px;font-size:22px;color:var(--gray);line-height:1.5;text-align:center}
+.rq.dk{background:var(--ink);color:#fff}
+.rq.dk .ic{background:var(--amber)}
+.rq.dk h4{color:#fff}.rq.dk h5{color:var(--sub)}
+.rq .fill{margin-top:28px;background:var(--teal);border-radius:16px;padding:24px 22px;font-size:25px;line-height:1.5;font-weight:700}
+.rq .fill small{display:block;margin-top:10px;font-size:19px;font-weight:500;color:var(--sub)}
+
+/* closing */
+.p19 .lb{position:absolute;left:120px;top:120px;font-size:30px;font-weight:700;color:var(--amber)}
+.p19 q{position:absolute;left:120px;top:190px;font-size:68px;line-height:1.35;font-weight:700;quotes:"“" "”"}
+.p19 .who{position:absolute;left:120px;top:400px;font-size:24px;color:var(--sub)}
+.p19 .pledge{position:absolute;left:120px;right:120px;top:560px;padding:36px 48px;border-radius:24px;background:var(--teal);font-size:44px;font-weight:700;line-height:1.4}
+.p19 .pledge b{color:var(--amber)}
+.p19 .thx{position:absolute;left:120px;top:860px;font-size:30px}
+
+/* drawer, notes, overview */
+#scrim{position:absolute;inset:0;background:rgba(10,20,24,.4);opacity:0;pointer-events:none;transition:opacity .3s;z-index:30}
+#drawer{position:absolute;top:0;right:0;width:760px;height:1080px;background:#fff;z-index:31;padding:56px 60px;transform:translateX(100%);transition:transform .45s var(--ez);overflow:auto}
+.dopen #scrim{opacity:1;pointer-events:auto}.dopen #drawer{transform:none}
+#drawer .x{position:absolute;right:36px;top:30px;border:0;background:none;font-size:44px;color:var(--gray);line-height:1}
+#drawer .dp{font-size:20px;font-weight:700;color:var(--teal)}
+#drawer h2{margin:12px 0 24px;font-size:36px;line-height:1.35;color:var(--ink)}
+#drawer .db{font-size:22px;line-height:1.65}
+#drawer .db h6{margin:22px 0 6px;font-size:20px;color:var(--teal)}
+#drawer .db h6.r{color:var(--red)}#drawer .db h6.a{color:var(--amber-d)}
+#drawer .db p{margin:0 0 6px}
+#drawer .src{margin-top:24px;padding:18px 22px;background:var(--paper);border-radius:12px;font-size:19px;line-height:1.6;color:var(--gray)}
+#notes{position:absolute;left:0;right:0;bottom:0;height:360px;background:rgba(14,33,38,.97);color:#fff;z-index:25;padding:34px 96px 100px;font-size:27px;line-height:1.65;transform:translateY(100%);transition:transform .4s var(--ez);overflow:auto;white-space:pre-line}
+.nopen #notes{transform:none}
+.nopen #chrome .cb{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}.nopen #pn{color:var(--sub)}
+#notes h5{margin:0 0 8px;font-size:20px;color:var(--amber)}
+#ov{position:absolute;inset:0;background:rgba(14,33,38,.96);z-index:40;padding:80px 96px;display:none}
+.oopen #ov{display:block}
+#ov h2{margin:0 0 30px;color:#fff;font-size:36px}
+#ov .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+#ov button{height:130px;border-radius:16px;border:0;background:var(--deep);color:#fff;text-align:left;padding:18px 20px;font-size:22px;line-height:1.35}
+#ov button b{display:block;font-size:18px;margin-bottom:8px}
+#ov button.intro b{color:var(--sub)}#ov button.result b{color:var(--amber)}#ov button.prop b{color:#E99A86}#ov button.hook b{color:#fff}
+#ov button.cur{outline:4px solid var(--amber)}
+#ov p{color:var(--sub);font-size:20px;margin-top:26px}
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 hook -->
+<section class="page dark p1" data-sec="hook" data-title="한 학기를 써 본 온라인 교무실" data-steps="3">
+  <div class="lead">온라인 교무실, 한 학기를 운영해 보니</div>
+  <h1>무엇이 좋았고, 무엇이 더 필요했을까요?</h1>
+  <div class="say a" data-s="1"><span class="who">A</span><q>실시간 공유로<br>빠른 정보 전달</q><small>온라인 교무실 ‘운영내용(실적)’ 중에서</small></div>
+  <div class="say b" data-s="2"><span class="who">B</span><q>일방향 소통을 넘어<br>월 1회 전체 회의</q><small>온라인 교무실 ‘2학기 반영 사항’ 중에서</small></div>
+  <div class="foot" data-s="3">두 문장 모두 1학기 교무업무 운영 결과 분석표에 실린 내용입니다.</div>
+</section>
+
+<!-- 2 hook vs -->
+<section class="page paper" data-sec="hook" data-title="97일 대 93일" data-steps="3">
+  <div class="vsq">1학기와 2학기, 수업일수를 나란히 놓으면 어떨까요?</div>
+  <div class="vs l" data-s="1"><h3>1학기 수업일수</h3><div class="n"><span class="cnt" data-to="97">97</span><small>일</small></div><p>3. 4.(월) 시업식 ~ 7. 23.(수) 여름방학식</p></div>
+  <div class="vsdot">VS</div>
+  <div class="vs r" data-s="2"><h3>2학기 수업일수</h3><div class="n"><span class="cnt" data-to="93">93</span><small>일</small></div><p>8. 13.(수) ~ 12. 31.(수) · 겨울방학 59일</p></div>
+  <div class="punch" data-s="3">2학기는 4일 짧지만, 동료장학·꿈자랑어울마당·늘봄발표회가 이어집니다</div>
+  <div class="srcl" data-s="3">자료: 2025학년도 1학기 교육과정 운영 결과 및 분석(교무업무) · 학사운영</div>
+</section>
+
+<!-- 3 title -->
+<section class="page dark p3" data-sec="hook" data-title="표지" data-steps="0">
+  <div class="kick">2025학년도 1학기 교육과정 운영 평가회</div>
+  <h1>2025학년도 1학기 교육과정 운영 결과 및 분석<em>교무업무</em></h1>
+  <div class="st2">희망의 메아리(ECHO)로 미래를 여는 더 나은 남산교육</div>
+  <div class="by">남산초등학교 &nbsp;|&nbsp; 2025. 7. 9.(수)</div>
+  <div class="orbit"><div class="o1"></div><div class="o2">운영 결과<br>분석</div><span class="t t6">1학기 실적</span><span class="t tf">2학기 반영</span></div>
+</section>
+
+<!-- 4 overview -->
+<section class="page p4" data-sec="intro" data-title="평가 개요" data-steps="2" data-drawer="overview">
+  <div class="sec"><i></i>평가 개요</div>
+  <h2 class="head">6개 세부 업무를 세 가지 눈으로 돌아봤습니다</h2>
+  <div class="quote"><b>운영내용(실적)</b> &nbsp;→&nbsp; <b class="r">운영상의 문제점</b> &nbsp;→&nbsp; <b class="a">2학기 반영 사항</b></div>
+  <div class="stat3" data-s="1">
+    <div class="stat"><div class="big k6"><span class="cnt" data-to="9">9</span><small>명</small></div><b class="k6">업무전담팀</b><span>교감 1 · 보직교사 6 · 교무행정사 2</span></div>
+    <div class="stat dk"><div class="big" style="color:var(--amber)"><span class="cnt" data-to="97">97</span><small style="color:#fff">일</small></div><b>1학기 수업일수</b><span>방학 20일 · 주요 학사일정 7건 운영</span></div>
+    <div class="stat"><div class="big" style="color:var(--ink)"><span class="cnt" data-to="3430">3430</span><small>만 원</small></div><b style="color:var(--ink)">현장체험학습 예산</b><span>문화체험의날 교육경비 2,259만 원<br>+ 각종 체험활동비 1,171만 원 (합계 34,298,000원)</span></div>
+  </div>
+  <div class="common" data-s="2"><b>세부 업무</b> &nbsp;업무전담팀 운영 · 온라인 교무실 운영 · 학사운영 · 학적관리 · 현장체험학습 운영 · 학부모회<br><b>함께 받는 의견</b> &nbsp;온라인 교무실 · 교장실/교무실 · 행정실 · 기타 지원요청과 건의사항</div>
+</section>
+
+<!-- 5 calendar flow -->
+<section class="page p5" data-sec="intro" data-title="학사운영" data-steps="2" data-drawer="haksa">
+  <div class="sec"><i></i>학사운영</div>
+  <h2 class="head">1학기 학사일정, 여덟 장면으로 돌아봅니다</h2>
+  <div class="flow" data-s="1">
+    <div class="fs"><div class="dot">3.4.</div><b>시업식<br>입학식</b><span>(월)</span></div>
+    <div class="fs"><div class="dot">3.19.</div><b>학교교육<br>설명회</b><span>(수) 체육관</span></div>
+    <div class="fs"><div class="dot">6.4.</div><b>학부모<br>공개수업</b><span>(수)</span></div>
+    <div class="fs"><div class="dot">6.9.</div><b>학부모<br>상담주간</b><span>(월)~</span></div>
+    <div class="fs now"><div class="dot">7.9.</div><b>1학기 교육과정<br>평가회</b><span>(수)</span></div>
+    <div class="fs"><div class="dot">7.23.</div><b>여름<br>방학식</b><span>(수)</span></div>
+    <div class="fs"><div class="dot">8.13.</div><b>여름방학<br>개학식</b><span>(수)</span></div>
+    <div class="fs last"><div class="dot">2학기</div><b>8.13.~<br>12.31.</b><span>수업일수 93일</span></div>
+  </div>
+  <div class="twin" data-s="2">
+    <div class="panel"><h4>운영상의 문제점<small>2학기 평가회 설문 예정</small></h4><ul>
+      <li><b>학교교육설명회</b> ‘담임 교사와의 시간’ 실시 여부</li>
+      <li><b>학부모 상담주간</b> 시기</li>
+    </ul></div>
+    <div class="panel wh cols"><h4>2학기 반영 사항 · 학사일정</h4><ul>
+      <li><b>수업일수 93일</b><br><span>겨울방학 59일</span></li>
+      <li><b>동료장학</b><br><span>9~10월</span></li>
+      <li><b>꿈자랑어울마당</b><br><span>11. 10.~</span></li>
+      <li><b>늘봄발표회</b><br><span>11. 26.</span></li>
+      <li style="grid-column:span 2"><b>1. 5.(월) 이후 개인일정</b> 계획 협조 <span>— 부득이한 학사일정 변경</span></li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 6 divider -->
+<section class="page dark div r" data-sec="result" data-title="PART 1 · 업무별 운영 결과" data-steps="0">
+  <div class="no">01</div><div class="lb">업무별 운영 결과</div>
+  <h2>해 본 것, 아쉬운 것,<br>바꿀 것</h2>
+  <div class="chips"><span>업무전담팀</span><span>온라인 교무실</span><span>학적관리</span><span>현장체험학습</span><span>학부모회</span></div>
+  <div class="ring"><i></i><svg viewBox="0 0 24 24" fill="none" stroke="#17333A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3h6v1"/><path d="M8.5 11.5l2 2 4-4"/><path d="M8.5 17h7"/></svg></div>
+</section>
+
+<!-- 7 team -->
+<section class="page" data-sec="result" data-title="업무전담팀 운영" data-steps="3" data-drawer="team">
+  <div class="sec result"><i></i>업무전담팀 운영</div>
+  <h2 class="head">보직이 바뀌어도 흔들리지 않는 업무전담팀이 필요합니다</h2>
+  <div class="tri">
+    <div class="tc op" data-s="1"><span class="tag"><i></i>운영내용(실적)</span>
+      <ul><li>업무전담팀 운영<span>교감, 보직교사 6명, 교무행정사 2명</span></li></ul>
+      <div class="bigf">9<small>명이 함께</small></div>
+    </div>
+    <div class="tc pb" data-s="2"><span class="tag"><i></i>운영상의 문제점</span>
+      <ul><li>새 학년도 보직교사 변동으로 인한 업무전담팀 운영 불분명</li></ul>
+    </div>
+    <div class="tc fx" data-s="3"><span class="tag"><i></i>2학기 반영 사항</span>
+      <ul>
+        <li>업무·학년 희망원 제출 시 새 학년도 협의 필요</li>
+        <li>2026년 보직교사 6명, 전담 TO 4명 예상<span>18~23학급 기준 · 3~6학년 4학급당 1명</span></li>
+        <li>보직교사 수업시수에 대한 배려</li>
+        <li>담임 보직교사에 대한 배려</li>
+      </ul>
+    </div>
+  </div>
+  <div class="band" data-s="3">2026년 예상 &nbsp;<b>보직교사 6명</b> · <b>전담 TO 4명</b> &nbsp;— 18~23학급, 3~6학년 4학급당 1명</div>
+</section>
+
+<!-- 8 online -->
+<section class="page" data-sec="result" data-title="온라인 교무실 운영" data-steps="3" data-drawer="online">
+  <div class="sec result"><i></i>온라인 교무실 운영</div>
+  <h2 class="head">온라인 교무실은 빨랐고, 이제 얼굴 보는 자리를 더합니다</h2>
+  <div class="tri">
+    <div class="tc op" data-s="1"><span class="tag"><i></i>운영내용(실적)</span>
+      <ul>
+        <li>새학기 시작 전 필요사항 조치 가능</li>
+        <li>실시간 공유로 빠른 정보 전달</li>
+        <li>언제 어디서나 접근 가능</li>
+        <li>수정·업데이트 가능한 협업</li>
+      </ul>
+    </div>
+    <div class="tc pb" data-s="2"><span class="tag"><i></i>운영상의 문제점</span>
+      <ul>
+        <li>일방향 온라인 소통으로 인한 대면 회의 필요성</li>
+        <li>온라인 교무실 개선·발전 방안 협의 필요 <span class="sv">2학기 평가회 설문 예정</span></li>
+      </ul>
+    </div>
+    <div class="tc fx" data-s="3"><span class="tag"><i></i>2학기 반영 사항</span>
+      <ul>
+        <li>월 1회 전체 회의</li>
+        <li>개선·발전 방안 협의를 통해 수정·보완 운영</li>
+      </ul>
+    </div>
+  </div>
+  <div class="band mint" data-s="3"><b>빠른 공유 + 얼굴 보는 회의</b>온라인 교무실의 장점은 살리고, 월 1회 전체 회의로 함께 이야기합니다</div>
+</section>
+
+<!-- 9 records -->
+<section class="page" data-sec="result" data-title="학적관리" data-steps="3" data-drawer="record">
+  <div class="sec result"><i></i>학적관리</div>
+  <h2 class="head">출결 증빙, 서류와 NEIS가 하나로 맞아야 합니다</h2>
+  <div class="quote" style="top:228px;font-size:28px;padding:26px 40px"><b>1학기 실적</b> &nbsp;3월~6월 출결증빙자료 마감 — 결석계, 교외체험학습 신청서·보고서</div>
+  <div class="act" style="top:360px">
+    <div class="ar hd"><div>점검 항목</div><div>운영상의 문제점</div><div>2학기 반영 사항</div></div>
+    <div class="ar" data-s="1"><div class="who"><i></i>NEIS 출결</div><div class="bad">결석계·교외체험학습 신청서·보고서와 NEIS 출결 불일치</div><div class="fix">결석계·교외체험학습 신청서·보고서와 NEIS 출결 일치</div></div>
+    <div class="ar" data-s="2"><div class="who"><i></i>서류 날짜</div><div class="bad">교외체험학습 신청서와 보고서의 날짜 상이</div><div class="fix">교외체험학습 신청서와 보고서의 날짜 확인하기</div></div>
+    <div class="ar" data-s="3"><div class="who"><i></i>제출 기한</div><div class="bad">교외체험학습 기한 준수 필요<br><span style="color:var(--gray);font-weight:500;font-size:22px">3일 전 신청, 3일 후 보고</span></div><div class="fix">교외체험학습 기한 준수</div></div>
+  </div>
+</section>
+
+<!-- 10 field trip -->
+<section class="page" data-sec="result" data-title="현장체험학습 운영" data-steps="3" data-drawer="trip">
+  <div class="sec result"><i></i>현장체험학습 운영</div>
+  <h2 class="head">현장체험학습, 운영 여부를 예산 신청 전에 정해야 합니다</h2>
+  <div class="trip" data-s="1"><h4>1학기 학년별 실시</h4>
+    <div class="gr">
+      <div><b>2학년</b><span>5. 8.<br>(목)</span></div>
+      <div><b>3학년</b><span>5. 14.<br>(수)</span></div>
+      <div><b>4학년</b><span>5. 10.<br>(금)</span></div>
+      <div><b>5학년</b><span>6. 18.<br>(수)</span></div>
+      <div><b>6학년</b><span>6. 17.(화)<br>7. 18.(금)</span></div>
+    </div>
+  </div>
+  <div class="money" data-s="1"><h4>예산 운영</h4>
+    <div class="mrow"><div class="lab">남산문화체험의날<br>교육경비</div><div class="bars"><div class="bar cf" style="width:46%"><em class="kf">22,590,000원</em></div></div></div>
+    <div class="mrow"><div class="lab">각종 체험활동비</div><div class="bars"><div class="bar c6" style="width:24%;transition-delay:.1s"><em class="k6">11,708,000원</em></div></div></div>
+    <div class="mrow tot"><div class="lab">합계</div><div class="bars"><div class="bar ck" style="width:70%;transition-delay:.2s"><em style="color:var(--ink)">34,298,000원</em></div></div></div>
+  </div>
+  <div class="twin2">
+    <div class="panel" data-s="2" style="background:#FBEDE8"><h4 style="color:var(--red)">운영상의 문제점</h4><ul>
+      <li>2024년 교육경비 신청을 통해 <b>전액 학교 예산</b>으로 운영</li>
+      <li>2025 현장체험학습 미운영 시 <b>불용예산 발생</b><br><span>교육경비 변경 운영 불가</span></li>
+    </ul></div>
+    <div class="panel wh" data-s="3"><h4>2학기 반영 사항</h4><ul>
+      <li>2학기 현장체험활동: <b>학기 초 계획한 범위 내</b>에서 예산 집행</li>
+      <li>2학기 평가회를 <b>교육경비 신청 전</b>에 운영해 현장체험학습 운영 여부 결정 <span>(2학기 평가회 설문 예정)</span></li>
+      <li>운영 여부는 학교의 입장만을 고려하기 어려운 상황</li>
+    </ul></div>
+  </div>
+</section>
+
+<!-- 11 parents -->
+<section class="page paper" data-sec="result" data-title="학부모회" data-steps="3" data-drawer="parents">
+  <div class="sec result"><i></i>학부모회</div>
+  <div class="vsq" style="top:110px;font-size:52px;letter-spacing:-.02em">쿠키 만들기 행사, 신청한 학생과 참여한 학생</div>
+  <div class="vs l" data-s="1" style="top:250px;height:430px"><h3>신청 인원</h3><div class="n"><span class="cnt" data-to="93">93</span><small>명</small></div><p>쿠키 만들기 행사 신청 학생</p></div>
+  <div class="vsdot" style="top:420px">→</div>
+  <div class="vs r" data-s="2" style="top:250px;height:430px"><h3>참여(혜택) 인원</h3><div class="n"><span class="cnt" data-to="16">16</span><small>명</small></div><p>함께 운영: 어린이날 아침맞이 축하(학생 반응 좋음)</p></div>
+  <div class="band" data-s="3" style="top:730px;background:#fff;color:var(--ink);border:1.5px solid var(--line)"><span class="kr">문제점</span> &nbsp;신청 인원 대비 혜택을 받은 학생 수가 적음</div>
+  <div class="band" data-s="3" style="top:840px"><b>2학기 반영</b> &nbsp;매년 운영될 수 있도록 학부모회에 협조 요청 · 많은 인원이 참석할 수 있는 프로그램 운영 권장</div>
+</section>
+
+<!-- 12 divider -->
+<section class="page dark div p" data-sec="prop" data-title="PART 2 · 2학기 반영과 건의" data-steps="0">
+  <div class="no">02</div><div class="lb">2학기 반영과 건의</div>
+  <h2>2학기에는<br>이렇게 바꿉니다</h2>
+  <div class="chips"><span>한눈에 보기</span><span>함께 정할 일</span><span>지원요청·건의사항</span></div>
+  <div class="ring"><i></i><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 0 1 13.7-5.6L20 8.5"/><path d="M20 4v4.5h-4.5"/><path d="M20 12a8 8 0 0 1-13.7 5.6L4 15.5"/><path d="M4 20v-4.5h4.5"/></svg></div>
+</section>
+
+<!-- 13 summary table -->
+<section class="page" data-sec="prop" data-title="한눈에 보기" data-steps="1" data-drawer="sum">
+  <div class="sec prop"><i></i>한눈에 보기</div>
+  <h2 class="head">1학기의 문제점이 2학기의 반영 사항이 됩니다</h2>
+  <table class="tbl">
+    <tr><th>세부 업무</th><th class="hp">운영상의 문제점</th><th class="hf">2학기 반영 사항</th></tr>
+    <tr><td>업무전담팀</td><td>보직교사 변동으로 운영 불분명</td><td>희망원 제출 시 새 학년도 협의, 보직교사 시수·담임 보직 배려</td></tr>
+    <tr><td>온라인 교무실</td><td>일방향 온라인 소통</td><td>월 1회 전체 회의, 협의 후 수정·보완 운영<em>설문</em></td></tr>
+    <tr><td>학사운영</td><td>설명회 담임 시간 실시 여부, 상담주간 시기<em>설문</em></td><td>2학기 수업일수 93일, 동료장학·꿈자랑어울마당·늘봄발표회</td></tr>
+    <tr><td>학적관리</td><td>NEIS 출결 불일치, 서류 날짜 상이</td><td>출결 일치·날짜 확인, 3일 전 신청·3일 후 보고</td></tr>
+    <tr><td>현장체험학습</td><td>미운영 시 불용예산 발생</td><td>계획 범위 내 집행, 교육경비 신청 전 운영 여부 결정<em>설문</em></td></tr>
+    <tr><td>학부모회</td><td>신청 93명 대비 혜택 16명</td><td>매년 운영 협조 요청, 많은 인원 참석 프로그램</td></tr>
+  </table>
+  <div class="band" data-s="1" style="top:900px">교무업무의 2학기 키워드: <b>미리 협의하고</b>, <b>얼굴 보고 소통하고</b>, <b>기한을 지킵니다</b></div>
+</section>
+
+<!-- 14 decide together -->
+<section class="page" data-sec="prop" data-title="함께 정할 일" data-steps="4" data-drawer="survey">
+  <div class="sec prop"><i></i>함께 정할 일</div>
+  <h2 class="head">2학기 평가회 설문으로 함께 정할 네 가지</h2>
+  <div class="imp4">
+    <div class="imp" data-s="1"><h4><em>1</em>학교교육설명회 ‘담임 교사와의 시간’</h4><p>3월 학교교육설명회에서 담임 교사와 학부모가 만나는 시간을 <b>계속 운영할지</b> 정합니다.</p></div>
+    <div class="imp" data-s="2"><h4><em>2</em>학부모 상담주간 시기</h4><p>1학기에는 6. 9.(월)부터 운영했습니다. <b>언제가 가장 알맞은지</b> 의견을 모읍니다.</p></div>
+    <div class="imp" data-s="3"><h4><em>3</em>온라인 교무실 개선·발전 방안</h4><p>빠른 공유의 장점은 살리고, <b>월 1회 전체 회의</b>와 함께 수정·보완합니다.</p></div>
+    <div class="imp dk" data-s="4"><h4><em>4</em>현장체험학습 운영 여부</h4><p>평가회를 <b>교육경비 신청 전</b>에 열어 운영 여부를 먼저 정합니다. 학교의 입장만 고려하기 어려운 사안입니다.</p></div>
+  </div>
+</section>
+
+<!-- 15 requests -->
+<section class="page paper" data-sec="prop" data-title="지원요청·건의사항" data-steps="1" data-drawer="req">
+  <div class="sec prop"><i></i>지원요청·건의사항</div>
+  <h2 class="head">지원이 필요한 것, 지금 말씀해 주세요</h2>
+  <div class="req">
+    <div class="rq"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2A6F6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><h4>온라인 교무실</h4><h5>공유·협업 공간</h5><div class="empty">오늘 협의에서<br>의견을 받습니다</div></div>
+    <div class="rq"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2A6F6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8l7-5 7 5v13"/><path d="M10 21v-6h4v6"/></svg></div><h4>교장실/교무실</h4><h5>학교 운영 전반</h5><div class="empty">오늘 협의에서<br>의견을 받습니다</div></div>
+    <div class="rq"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#2A6F6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 11h8M8 15h5"/></svg></div><h4>행정실</h4><h5>시설·예산·행정 지원</h5><div class="empty">오늘 협의에서<br>의견을 받습니다</div></div>
+    <div class="rq dk" data-s="1"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#17333A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><path d="M4 10h16v5H4z"/><path d="M6 15v6M18 15v6"/></svg></div><h4>기타</h4><h5>학생 생활 공간</h5><div class="fill">연구실 의자를 각 층 복도로 옮겨 학생 휴게 공간으로 활용<small>1학기 건의사항</small></div></div>
+  </div>
+</section>
+
+<!-- 16 closing -->
+<section class="page dark p19" data-sec="hook" data-title="마무리" data-steps="2">
+  <div class="lb">1학기를 마치며</div>
+  <q>희망의 메아리(ECHO)로<br>미래를 여는 더 나은 남산교육</q>
+  <div class="who">남산초등학교 교육 비전</div>
+  <div class="pledge" data-s="1"><b>1학기</b>에 확인한 문제점은 <b>2학기</b>의 반영 사항으로,<br>함께 정할 일은 2학기 평가회 설문으로 이어갑니다.</div>
+  <div class="thx" data-s="2">감사합니다 &nbsp;|&nbsp; 2025학년도 1학기 교육과정 운영 평가회 · 교무업무</div>
+</section>
+
+<!-- chrome -->
+<div id="chrome">
+  <div id="prog" aria-label="쪽 이동"></div>
+  <span id="pn">1 / 1</span>
+  <button class="cb" id="bWhy" hidden>원문 보기</button>
+  <button class="cb" id="bNotes" title="N">대본</button>
+  <button class="cb" id="bOv" title="O">쪽 목록</button>
+  <button class="cb" id="bPrev" aria-label="이전">‹</button>
+  <button class="cb" id="bNext" aria-label="다음">›</button>
+</div>
+<div id="notes"><h5 id="notesT"></h5><div id="notesB"></div></div>
+<div id="scrim"></div>
+<aside id="drawer" aria-hidden="true"><button class="x" id="dx" aria-label="닫기">×</button><div class="dp" id="dp"></div><h2 id="dt"></h2><div class="db" id="db"></div></aside>
+<div id="ov"><h2>쪽 목록</h2><div class="grid" id="ovg"></div><p>← → 이동 · N 대본 · O 쪽 목록 · Esc 닫기 · 주소 끝에 #static 을 붙이면 모든 요소가 한 번에 보입니다</p></div>
+</div>
+
+<script>
+(function(){
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const stage=$('#stage'), pages=$$('.page'), html=document.documentElement;
+
+const NOTES=[
+"[천천히 시작]\n1학기 동안 온라인 교무실을 운영했습니다. (A 가리키며) 실시간 공유로 정보가 빠르게 전달되었습니다.\n(B 가리키며) 그런데 2학기 반영 사항에는 '월 1회 전체 회의'가 들어갔습니다.\n빠른 공유와 얼굴을 보는 소통, 두 가지가 모두 필요하다는 것이 이번 평가의 출발점입니다.",
+"1학기 수업일수는 97일, 2학기는 93일입니다.\n2학기는 4일 짧지만 동료장학(9~10월), 꿈자랑어울마당(11. 10.~), 늘봄발표회(11. 26.)가 이어집니다.\n그래서 1학기를 꼼꼼히 돌아보는 일이 더 중요합니다.",
+"지금부터 2025학년도 1학기 교육과정 운영 결과 중 교무업무를 말씀드리겠습니다.\n운영내용, 문제점, 2학기 반영 사항 순서로 정리했습니다.",
+"교무업무는 6개 세부 업무로 나누어 평가했습니다.\n업무전담팀은 교감, 보직교사 6명, 교무행정사 2명으로 9명이 운영했고, 1학기 수업일수는 97일이었습니다.\n현장체험학습 예산은 문화체험의날 교육경비와 각종 체험활동비를 합쳐 34,298,000원이었습니다.\n마지막에는 지원요청과 건의사항도 함께 받겠습니다.",
+"1학기 학사일정입니다. 3월 4일 시업식과 입학식, 3월 19일 체육관에서 학교교육설명회, 6월 4일 학부모 공개수업, 6월 9일부터 학부모 상담주간을 운영했습니다.\n오늘 7월 9일 평가회를 거쳐 7월 23일 방학식, 8월 13일 개학식이 있습니다.\n학교교육설명회의 '담임 교사와의 시간' 실시 여부와 학부모 상담주간 시기는 2학기 평가회 설문으로 정하겠습니다.\n2학기는 수업일수 93일, 겨울방학 59일입니다. 부득이한 학사일정 변경으로 1월 5일 이후 개인일정 계획에 협조 부탁드립니다.",
+"이제 업무별 운영 결과를 보겠습니다. 업무전담팀, 온라인 교무실, 학적관리, 현장체험학습, 학부모회 순서입니다.",
+"업무전담팀은 교감, 보직교사 6명, 교무행정사 2명이 운영했습니다.\n새 학년도 보직교사가 바뀌면서 업무전담팀 운영이 불분명해지는 문제가 있었습니다.\n그래서 업무·학년 희망원을 낼 때 새 학년도에 대해 미리 협의하려 합니다. 2026년에는 18~23학급 기준으로 보직교사 6명, 전담 TO 4명이 예상됩니다.\n보직교사의 수업시수와 담임 보직교사에 대한 배려도 함께 반영하겠습니다.",
+"온라인 교무실은 새학기 시작 전에 필요한 것을 미리 조치할 수 있었고, 실시간 공유로 정보가 빨리 전달되었습니다. 언제 어디서나 접근하고 함께 수정할 수 있었습니다.\n다만 소통이 한 방향으로 흐르면서 대면 회의가 필요하다는 의견이 있었습니다.\n2학기에는 월 1회 전체 회의를 하고, 개선·발전 방안은 협의를 거쳐 수정·보완하겠습니다. 2학기 평가회 설문으로도 의견을 받겠습니다.",
+"학적관리입니다. 3월부터 6월까지 결석계, 교외체험학습 신청서와 보고서 등 출결 증빙자료를 마감했습니다.\n점검해 보니 서류와 NEIS 출결이 맞지 않는 경우, 신청서와 보고서의 날짜가 다른 경우가 있었습니다.\n2학기에는 NEIS 출결과 서류를 일치시키고, 날짜를 확인하고, 3일 전 신청·3일 후 보고 기한을 꼭 지켜 주시기 바랍니다.",
+"현장체험학습은 2학년부터 6학년까지 1학기에 실시했습니다. 6학년은 6월 17일과 7월 18일 두 번입니다.\n예산은 남산문화체험의날 교육경비 2,259만 원과 각종 체험활동비 1,171만 원, 합계 34,298,000원입니다.\n2024년 교육경비 신청으로 전액 학교 예산으로 운영했기 때문에, 운영하지 않으면 불용예산이 생기고 교육경비를 바꿔 쓸 수도 없습니다.\n그래서 2학기 평가회를 교육경비 신청 전에 열어 운영 여부를 먼저 정하겠습니다. 다만 학교 입장만으로 정하기 어려운 사안이라는 점도 함께 고려하겠습니다.",
+"학부모회는 어린이날 아침맞이 축하를 운영했고, 학생들의 반응이 좋았습니다.\n쿠키 만들기 행사는 93명이 신청했지만 16명만 참여할 수 있었습니다.\n매년 운영될 수 있도록 학부모회에 협조를 요청하고, 더 많은 학생이 참여할 수 있는 프로그램을 권장하겠습니다.",
+"이제 2학기에 무엇을 바꿀지, 그리고 건의사항을 정리하겠습니다.",
+"여섯 가지 업무의 문제점과 2학기 반영 사항을 한 장에 정리했습니다.\n노란 '설문' 표시는 2학기 평가회 설문으로 함께 정할 항목입니다.\n한마디로 정리하면, 미리 협의하고, 얼굴 보고 소통하고, 기한을 지키는 2학기입니다.",
+"2학기 평가회 설문으로 함께 정할 일은 네 가지입니다.\n학교교육설명회의 담임 교사와의 시간, 학부모 상담주간 시기, 온라인 교무실 개선 방안, 그리고 현장체험학습 운영 여부입니다.\n특히 현장체험학습은 교육경비 신청 전에 결정해야 하므로 평가회 시기를 앞당기겠습니다.",
+"지원요청과 건의사항입니다. 온라인 교무실, 교장실·교무실, 행정실에 대한 의견은 오늘 협의에서 받겠습니다.\n기타 의견으로는 연구실 의자를 각 층 복도로 옮겨 학생 휴게 공간으로 활용하자는 건의가 있었습니다.",
+"희망의 메아리로 미래를 여는 더 나은 남산교육.\n1학기에 확인한 문제점은 2학기 반영 사항으로, 함께 정할 일은 2학기 평가회 설문으로 이어가겠습니다.\n감사합니다."
+];
+
+const DR={
+ overview:{t:"평가표의 구성",b:`<p>원문: 「2025학년도 1학기 교육과정 운영 결과 및 분석 — 교무업무」(1~2쪽)</p><h6>표의 열</h6><p>세부 업무명 · 운영내용(실적) · 운영상의 문제점 · 2학기 반영 사항</p><h6>세부 업무</h6><p>업무전담팀 운영, 온라인 교무실 운영, 학사운영, 학적관리, 현장체험학습 운영, 학부모회</p><h6>2쪽 하단</h6><p>구분별 지원요청/건의사항: 온라인 교무실, 교장실/교무실, 행정실, 기타</p>`,s:"현장체험학습 예산 3,430만 원은 34,298,000원을 만 원 단위로 반올림한 값입니다."},
+ haksa:{t:"학사운영 원문",b:`<h6>운영내용(실적)</h6><p>▶ 3.4.(월) 시업식, 입학식<br>▶ 3.19.(수) 학교교육설명회(체육관)<br>▶ 6.4.(수) 학부모 공개수업<br>▶ 6.9.(월) 학부모 상담주간<br>▶ 7.9.(수) 1학기 교육과정 평가회<br>▶ 7.23.(수) 여름방학식<br>▶ 8.13.(수) 여름방학 개학식<br>▶ 1학기 수업일수 : 97일(방학 20일)</p><h6 class="r">운영상의 문제점</h6><p>▶ 학교교육설명회 담임 교사와의 시간 실시 여부 (2학기평가회 설문예정)<br>▶ 학부모 상담주간 시기 (2학기평가회 설문예정)</p><h6 class="a">2학기 반영 사항</h6><p>▶ 2학기 학사일정: 8.13.(수) ~ 12.31.(수), 수업일수 93일, 겨울방학일수 59일<br>▶ 동료장학(9~10월) ▶ 꿈자랑어울마당(11.10.~) ▶ 늘봄발표회(11.26.)<br>▶ 부득이한 학사일정 변경으로 인한 1월 5일(월) 이후 개인일정 계획 협조</p>`,s:"교무업무 1쪽"},
+ team:{t:"업무전담팀 운영 원문",b:`<h6>운영내용(실적)</h6><p>▶ 업무전담팀 운영 (교감, 보직교사 6명, 교무행정사 2명)</p><h6 class="r">운영상의 문제점</h6><p>▶ 새 학년도 보직교사 변동으로 인한 업무전담팀 운영 불분명</p><h6 class="a">2학기 반영 사항</h6><p>▶ 업무, 학년 희망원 제출시 새 학년도 협의 필요<br>▶ 2026년 보직교사 6명(18~23학급), 전담TO 4명(3~6학년 4학급당 1명) 예상<br>▶ 보직교사에 수업시수에 대한 배려<br>▶ 담임 보직교사에 대한 배려</p>`,s:"교무업무 1쪽"},
+ online:{t:"온라인 교무실 운영 원문",b:`<h6>운영내용(실적)</h6><p>▶ 새학기 시작 전 필요사항 조치 가능<br>▶ 실시간 공유로 빠른 정보 전달<br>▶ 언제 어디서나 접근 가능<br>▶ 수정, 업데이트 가능한 협업</p><h6 class="a">문제점 · 2학기 반영 사항</h6><p>▶ 온라인 교무실에 대한 개선, 발전 방안 등에 대한 협의를 통해 수정, 보완 운영 (2학기평가회 설문예정)<br>▶ 일방향 온라인 소통으로 인한 대면 회의 필요성 — 월 1회 전체 회의</p>`,s:"교무업무 1쪽. 슬라이드에서는 원문 두 항목을 ‘문제점’과 ‘반영 사항’으로 나누어 배치했습니다."},
+ record:{t:"학적관리 원문",b:`<h6>운영내용(실적)</h6><p>▶ 3월~6월 출결증빙자료 마감 (결석계, 교외체험학습신청, 보고서)</p><h6 class="r">운영상의 문제점</h6><p>▶ 결석계와 교외체험학습신청 보고서와 neis 출결 불일치<br>▶ 교외체험학습 신청서와 보고서의 날짜 상이<br>▶ 교외체험학습 기한 준수 (3일전 신청, 3일 후 보고)</p><h6 class="a">2학기 반영 사항</h6><p>▶ 결석계와 교외체험학습신청 보고서와 neis 출결 일치<br>▶ 교외체험학습 신청서와 보고서의 날짜 확인하기<br>▶ 교외체험학습 기한 준수</p>`,s:"교무업무 1쪽"},
+ trip:{t:"현장체험학습 운영 원문",b:`<h6>운영내용(실적)</h6><p>▶ 1학기 현장체험학습 실시<br>- 2학년: 5.8.(목) 3학년: 5.14.(수)<br>- 4학년: 5.10.(금) 5학년: 6.18.(수)<br>- 6학년: 6.17.(화), 7.18.(금)<br>- 예산 운영: 남산문화체험의날교육경비(22,590,000), 각종 체험활동비(11,708,000), 합계(34,298,000원)</p><h6 class="r">운영상의 문제점</h6><p>▶ 2024년 교육경비 신청을 통해 전액 학교 예산으로 운영<br>▶ 2025 현장체험학습 미운영시 불용예산 발생(교육경비 변경 운영 불가)</p><h6 class="a">2학기 반영 사항</h6><p>▶ 2학기 현장체험활동 - 학기 초 계획한 범위 내에서 예산집행<br>▶ 2학기 교육과정 평가회 시기를 교육경비 신청 전에 운영, 현장체험학습 운영 여부 결정 (2학기평가회 설문예정)<br>▶ 현장체험학습 운영여부는 학교의 입장만을 고려하기 어려운 상황</p>`,s:"교무업무 1쪽"},
+ parents:{t:"학부모회 원문",b:`<h6>운영내용(실적)</h6><p>▶ 어린이날 아침맞이 축하 — 학생들의 반응이 좋음<br>▶ 쿠키 만들기 행사 — 16명 참여</p><h6 class="r">운영상의 문제점</h6><p>▶ 신청 인원(93명) 대비 혜택(16명) 학생 수가 적음</p><h6 class="a">2학기 반영 사항</h6><p>▶ 매년 운영될 수 있도록 학부모회에 협조 요청<br>▶ 많은 인원이 참석할 수 있는 프로그램 운영 권장</p>`,s:"교무업무 2쪽"},
+ sum:{t:"요약 방법",b:`<p>각 세부 업무의 ‘운영상의 문제점’과 ‘2학기 반영 사항’을 한 줄로 줄였습니다. 원문 문장은 각 쪽의 ‘원문 보기’에서 확인할 수 있습니다.</p><p>‘설문’ 표시: 원문에 “2학기평가회 설문예정”이 붙은 항목</p>`,s:"교무업무 1~2쪽"},
+ survey:{t:"‘2학기평가회 설문예정’ 항목",b:`<p>▶ 학교교육설명회 담임 교사와의 시간 실시 여부 (학사운영)<br>▶ 학부모 상담주간 시기 (학사운영)<br>▶ 온라인 교무실 개선, 발전 방안 협의 (온라인 교무실)<br>▶ 교육경비 신청 전 현장체험학습 운영 여부 결정 (현장체험학습)</p>`,s:"원문에 설문 예정으로 표시된 네 항목을 모았습니다."},
+ req:{t:"지원요청/건의사항 원문",b:`<p>온라인 교무실 ▶ (빈칸)<br>교장실/교무실 ▶ (빈칸)<br>행정실 ▶ (빈칸)<br>기타 ▶ 연구실 의자 각 층 복도로 이동 후 학생 휴게 공간으로 활용</p>`,s:"교무업무 2쪽 하단 표"}
+};
+
+/* drawer */
+let cur=0, step=0;
+function openDrawer(k){const d=DR[k];if(!d)return;$('#dp').textContent=pages[cur].dataset.title;$('#dt').textContent=d.t;$('#db').innerHTML=d.b+`<div class="src">${d.s}</div>`;stage.classList.add('dopen');$('#drawer').setAttribute('aria-hidden','false');$('#dx').focus();}
+function closeDrawer(){stage.classList.remove('dopen');$('#drawer').setAttribute('aria-hidden','true');}
+$('#dx').onclick=closeDrawer;$('#scrim').onclick=closeDrawer;
+$('#bWhy').onclick=e=>{e.stopPropagation();openDrawer(pages[cur].dataset.drawer);};
+
+/* navigation */
+const prog=$('#prog'), ovg=$('#ovg');
+pages.forEach((p,i)=>{
+  const b=document.createElement('button');b.className=p.dataset.sec;b.title=`${i+1}. ${p.dataset.title}`;b.setAttribute('aria-label',b.title);b.onclick=e=>{e.stopPropagation();go(i,0);};prog.appendChild(b);
+  const o=document.createElement('button');o.className=p.dataset.sec;o.innerHTML=`<b>${i+1}</b>${p.dataset.title}`;o.onclick=()=>{toggleOv(false);go(i,0);};ovg.appendChild(o);
+});
+const fmtN=n=>n.toLocaleString('ko-KR');
+function countUp(el){
+  const to=+el.dataset.to; if(html.classList.contains('static')||to===0){el.textContent=fmtN(to);return;}
+  const t0=performance.now(), dur=1100; el.textContent=0;
+  (function f(t){const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.textContent=fmtN(Math.round(to*e)); if(k<1) requestAnimationFrame(f);})(t0);
+}
+function apply(){
+  const p=pages[cur];
+  $$('[data-s]',p).forEach(el=>{
+    const on=html.classList.contains('static')||step>=+el.dataset.s;
+    const was=el.classList.contains('in'); el.classList.toggle('in',on);
+    if(on&&!was) $$('.cnt',el).forEach(countUp);
+  });
+}
+function go(i,s){
+  i=Math.max(0,Math.min(pages.length-1,i));
+  pages.forEach((p,j)=>p.classList.toggle('on',j===i));
+  if(i!==cur){ $$('[data-s]',pages[cur]).forEach(el=>el.classList.remove('in')); }
+  cur=i; step=s;
+  const p=pages[i];
+  if(s===-1) step=+p.dataset.steps||0;
+  stage.classList.toggle('darkchrome',p.classList.contains('dark'));
+  $('#bWhy').hidden=!p.dataset.drawer;
+  $$('#prog button').forEach((b,j)=>{b.classList.toggle('done',j<=i);b.classList.toggle('cur',j===i);});
+  $('#pn').textContent=`${i+1} / ${pages.length}`;
+  $$('#ovg button').forEach((b,j)=>b.classList.toggle('cur',j===i));
+  $('#notesT').textContent=`${i+1}. ${p.dataset.title} · 발표 대본`;
+  $('#notesB').textContent=NOTES[i]||'';
+  if(location.hash!=='#static') history.replaceState(null,'','#'+(i+1));
+  if(step===0) $$('.cnt',p).forEach(el=>{if(!el.closest('[data-s]')) countUp(el);});
+  apply();
+}
+function next(){const max=+pages[cur].dataset.steps||0; if(step<max&&!html.classList.contains('static')){step++;apply();} else if(cur<pages.length-1) go(cur+1,0);}
+function prev(){if(step>0&&!html.classList.contains('static')){step--;apply();} else if(cur>0) go(cur-1,-1);}
+$('#bNext').onclick=e=>{e.stopPropagation();next();};$('#bPrev').onclick=e=>{e.stopPropagation();prev();};
+function toggleNotes(){stage.classList.toggle('nopen');}
+function toggleOv(v){stage.classList.toggle('oopen',v);}
+$('#bNotes').onclick=e=>{e.stopPropagation();toggleNotes();};
+$('#bOv').onclick=e=>{e.stopPropagation();toggleOv(!stage.classList.contains('oopen'));};
+document.addEventListener('keydown',e=>{
+  if(stage.classList.contains('dopen')&&e.key==='Escape'){closeDrawer();return;}
+  if(stage.classList.contains('oopen')){if(e.key==='Escape'||e.key.toLowerCase()==='o')toggleOv(false);return;}
+  const k=e.key;
+  if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'){e.preventDefault();next();}
+  else if(k==='ArrowLeft'||k==='PageUp'||k==='Backspace'){e.preventDefault();prev();}
+  else if(k==='Home')go(0,0); else if(k==='End')go(pages.length-1,-1);
+  else if(k.toLowerCase()==='n')toggleNotes();
+  else if(k.toLowerCase()==='o')toggleOv(true);
+  else if(k==='Escape'){stage.classList.remove('nopen');}
+});
+stage.addEventListener('click',e=>{
+  if(e.target.closest('a,button,#drawer,#notes,#ov'))return;
+  if(stage.classList.contains('dopen'))return;
+  next();
+});
+function fit(){const k=Math.min(innerWidth/1920,innerHeight/1080);stage.style.transform=`translate(${(innerWidth-1920*k)/2}px,${(innerHeight-1080*k)/2}px) scale(${k})`;}
+addEventListener('resize',fit);fit();
+if(location.hash==='#static'){html.classList.add('static');go(0,0);}
+else{const h=parseInt(location.hash.slice(1),10);go(h>0?h-1:0,0);}
+window.__pres={go,next,prev,get cur(){return cur},pages:pages.length};
+})();
+</script>
+</body>
+</html>
